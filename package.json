@@ -1,0 +1,19 @@
+{
+  "name": "mara-pau-budget",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "typecheck": "nuxt typecheck"
+  },
+  "dependencies": {
+    "@nuxtjs/supabase": "^2.0.9",
+    "@supabase/supabase-js": "^2.106.1",
+    "nuxt": "^4.4.6",
+    "vue": "^3.5.34"
+  }
+}
