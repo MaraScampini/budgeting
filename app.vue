@@ -145,6 +145,17 @@ const accountGroups = computed(() => [
   { id: 'daily', title: 'Daily money', accounts: store.accounts.value.filter((account) => account.type === 'checking') },
   { id: 'saving', title: 'Savings', accounts: store.accounts.value.filter((account) => account.type === 'saving') }
 ])
+const categorySettings = computed(() => categoryBudgetRows.value.map((category) => ({
+  id: category.id,
+  name: category.name,
+  owner: category.owner,
+  budget: category.budget,
+  previousBudget: category.id === 'mara-fun' ? 400 : category.id === 'pau-fun' ? 120 : category.id === 'groceries' ? 390 : category.budget,
+  cycle: category.owner === 'joint' ? 'May joint cycle' : `May ${category.owner} cycle`,
+  reset: category.owner === 'joint' ? 'Joint funding cycle' : `${category.owner} salary cycle`,
+  defaultAccount: store.accounts.value.find((account) => account.id === category.defaultAccountId)?.name || 'None',
+  color: category.color
+})))
 </script>
 
 <template>
@@ -406,26 +417,10 @@ const accountGroups = computed(() => [
       </div>
 
       <div v-if="activeView === 'settings'" class="settings-grid">
-        <section class="panel setup-panel">
-          <div class="section-title">
-            <Icon name="settings" :size="20" />
-            <h2>Supabase connection</h2>
-          </div>
-          <div class="connection-row">
-            <span>Project URL</span>
-            <strong>{{ config.public.supabaseUrl || config.public.supabase?.url || 'Not configured' }}</strong>
-          </div>
-          <div class="connection-row">
-            <span>Browser key</span>
-            <strong>{{ supabaseReady ? 'Configured' : 'Missing' }}</strong>
-          </div>
-          <p class="empty-copy">Schema migration is in <code>supabase/migrations</code>. Once the MCP SQL tool is available in this session, I can apply it directly to the project.</p>
-        </section>
-
-        <section class="panel">
+        <section class="panel category-settings-panel">
           <div class="section-title">
             <Icon name="sliders" :size="20" />
-            <h2>Categories</h2>
+            <h2>Categories and budgets</h2>
           </div>
 
           <div class="inline-form">
@@ -440,19 +435,38 @@ const accountGroups = computed(() => [
             </button>
           </div>
 
-          <article v-for="category in store.categories.value" :key="category.id" class="category-row">
+          <article v-for="category in categorySettings" :key="category.id" class="category-setting-row">
             <span :style="{ background: category.color }" />
             <div>
               <strong>{{ category.name }}</strong>
-              <small>{{ category.owner }} · default {{ store.accounts.value.find((account) => account.id === category.defaultAccountId)?.name }}</small>
+              <small>{{ category.owner }} · {{ category.reset }} · {{ category.defaultAccount }}</small>
             </div>
-            <button class="icon-button" @click="store.deleteCategory(category.id)" aria-label="Delete category">
-              <Icon name="trash" :size="17" />
-            </button>
+            <div class="setting-history">
+              <strong>{{ category.cycle }}</strong>
+              <small>Previous budget {{ store.eur(category.previousBudget) }}</small>
+            </div>
+            <div class="setting-amount">
+              <strong>{{ store.eur(category.budget) }}</strong>
+              <small>current budget</small>
+            </div>
           </article>
         </section>
 
-        <section class="panel">
+        <section class="panel account-settings-panel">
+          <div class="section-title">
+            <Icon name="savings" :size="20" />
+            <h2>Accounts</h2>
+          </div>
+          <article v-for="account in store.accounts.value" :key="account.id" class="account-row">
+            <div>
+              <strong>{{ account.name }}</strong>
+              <span>{{ account.owner }} · {{ account.type }}</span>
+            </div>
+            <strong>{{ store.eur(account.balance) }}</strong>
+          </article>
+        </section>
+
+        <section class="panel bills-settings-panel">
           <div class="section-title">
             <Icon name="bills" :size="20" />
             <h2>Recurring bills</h2>
@@ -460,11 +474,28 @@ const accountGroups = computed(() => [
           <article v-for="bill in store.recurringBills.value" :key="bill.id" class="bill-row static">
             <div>
               <strong>{{ bill.name }}</strong>
-              <span>Day {{ bill.dueDay }} · {{ bill.amountType }} · {{ store.accounts.value.find((account) => account.id === bill.accountId)?.name }}</span>
+              <span>Due day {{ bill.dueDay }} · {{ bill.amountType }} · {{ store.accounts.value.find((account) => account.id === bill.accountId)?.name }}</span>
             </div>
             <strong>{{ store.eur(bill.expectedAmount) }}</strong>
           </article>
         </section>
+
+        <section class="panel savings-settings-panel">
+          <div class="section-title">
+            <Icon name="savings" :size="20" />
+            <h2>Savings plans and pockets</h2>
+          </div>
+          <article v-for="item in savingsPlan" :key="item.id" class="saving-row">
+            <div class="saving-row-top">
+              <div>
+                <strong>{{ item.name }}</strong>
+                <span>{{ item.owner }} · {{ item.timing }}</span>
+              </div>
+              <strong>{{ store.eur(item.planned) }}</strong>
+            </div>
+          </article>
+        </section>
+
       </div>
     </section>
 

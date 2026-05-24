@@ -186,6 +186,10 @@ button {
   grid-template-columns: minmax(0, 1fr);
 }
 
+.settings-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .panel {
   border: 1px solid var(--line);
   border-radius: 0.7rem;
@@ -637,25 +641,77 @@ progress::-webkit-progress-value {
   margin-bottom: 0.85rem;
 }
 
-.category-row {
+.account-settings-panel,
+.bills-settings-panel,
+.savings-settings-panel {
+  display: grid;
+  gap: 0.7rem;
+  align-content: start;
+  grid-auto-rows: max-content;
+}
+
+.category-settings-panel {
+  grid-column: 1 / -1;
+  align-content: start;
+}
+
+.category-setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+  background: white;
+  padding: 0.75rem;
+}
+
+.category-setting-row div {
+  min-width: 0;
+}
+
+.category-setting-row strong,
+.category-setting-row small,
+.setting-history strong,
+.setting-history small,
+.setting-amount small {
+  display: block;
+}
+
+.category-setting-row small,
+.setting-history small,
+.setting-amount small {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.category-setting-row {
   margin-top: 0.55rem;
 }
 
-.connection-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  border-bottom: 1px solid var(--line);
-  padding: 0.75rem 0;
+.category-setting-row > span {
+  flex: 0 0 auto;
+  width: 0.7rem;
+  height: 2.7rem;
+  border-radius: 999px;
 }
 
-.connection-row span {
-  color: var(--muted);
+.category-setting-row > div:nth-child(2) {
+  flex: 1 1 auto;
 }
 
-.connection-row strong {
-  overflow-wrap: anywhere;
+.setting-history {
+  flex: 0 1 18rem;
+}
+
+.setting-amount {
+  flex: 0 0 auto;
   text-align: right;
+  white-space: nowrap;
+}
+
+.category-row {
+  margin-top: 0.55rem;
 }
 
 .category-row > span {
@@ -706,7 +762,8 @@ progress::-webkit-progress-value {
 
   .spending-hero,
   .category-budget-panel,
-  .account-list {
+  .account-list,
+  .category-settings-panel {
     grid-column: auto;
   }
 
@@ -784,6 +841,17 @@ progress::-webkit-progress-value {
   }
 
   .bill-summary-row > div:last-child {
+    text-align: left;
+  }
+
+  .category-setting-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .setting-history,
+  .setting-amount {
+    flex-basis: auto;
     text-align: left;
   }
 }
